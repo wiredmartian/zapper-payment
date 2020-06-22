@@ -1,0 +1,24 @@
+{
+  "name": "zapper-payment",
+  "version": "1.0.0",
+  "description": "Zapper API integration",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node ./src/app.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/wiredmartian/zapper-payment.git"
+  },
+  "author": "wiredmartian",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/wiredmartian/zapper-payment/issues"
+  },
+  "homepage": "https://github.com/wiredmartian/zapper-payment#readme",
+  "dependencies": {
+    "body-parser": "^1.19.0",
+    "express": "^4.17.1"
+  }
+}
