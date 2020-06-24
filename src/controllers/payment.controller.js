@@ -23,11 +23,11 @@ axios.defaults.headers["Content-Type"] = "application/json";
 
 class PaymentController {
 
-    async uploadInvoice() {
+    async uploadInvoice(invoiceType) {
         const today = new Date(Date.now());
         const invoice = {
             externalReference: "MAR-INV-" + Math.floor(Math.random() * 1000),
-            siteReference: "martian-ref",
+            siteReference: "martian.co.za",
             currencyISOCode: "ZAR",
             amount: 1000,
             lineItems: [
@@ -44,9 +44,20 @@ class PaymentController {
             createdUTCDate: today.toISOString(),
             originReference: ""
         }
+        /** control generated invoice types */
+        let invType = "image/svg+xml";
+
+        if (invoiceType === 1) {
+            invType = "application/json"
+        }
+        if (invoiceType === 2) {
+            invType = "text/plain";
+        }
+        /** control generated invoice types */
+
         return axios.post(`/api/v1/merchants/${config.MERCHANT_ID}/sites/${config.SITE_ID}/invoices`, invoice, {
             headers: {
-                "Accept": "image/svg+xml"
+                "Accept": invType
             }
         });
     }
