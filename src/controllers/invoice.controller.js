@@ -70,11 +70,16 @@ class InvoiceController {
     /**
      * @description Closes an invoice to ensure your customers receive the Zapper Code that is relevant to their payment
      * Invoices are automatically closed after 1Hr
+     * @returns {string} - success
      * */
     async closeInvoiceByRef(invoiceReference) {
         return axios.delete(`/api/v1/merchants/${config.MERCHANT_ID}/sites/${config.SITE_ID}/invoices/${invoiceReference}`);
     }
-
+    /**
+     * @description Closes an invoice to ensure your customers receive the Zapper Code that is relevant to their payment
+     * Invoices are automatically closed after 1Hr
+     * @returns {string} - success
+     * */
     async closeInvoiceByExternalRef(externalRef) {
         return axios.delete(`/api/v1/merchants/${config.MERCHANT_ID}/sites/${config.SITE_ID}/invoices?externalReference=${externalRef}`);
     }
