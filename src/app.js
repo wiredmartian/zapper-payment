@@ -1,22 +1,13 @@
-
 const express = require("express");
-const PaymentController = require("./controllers/payment.controller");
-
+const InvoiceController = require("./controllers/invoice.controller");
 
 const app = express();
 
-
-app.get("/", (req, res) => {
-    res.json("Hello World");
-})
-
-app.get("/invoice", async (req, res) => {
+app.post("/invoice", async (req, res) => {
     try {
-        const pay = new PaymentController();
-        const result = await pay.uploadInvoice();
+        const result = await new InvoiceController().uploadInvoice(0);
         return res.send(result.data);
     } catch (e) {
-        console.error(e);
         return res.send(400, { error: e.message });
     }
 })

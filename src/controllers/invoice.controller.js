@@ -21,8 +21,14 @@ axios.defaults.headers["Authorization"] = `Bearer ${ config.MERCHANT_API_KEY }`;
 axios.defaults.headers["Content-Type"] = "application/json";
 /***/
 
-class PaymentController {
+class InvoiceController {
 
+    /**
+     * @description Create a Zapper invoice and
+     * will return either a qr-code image, object with reference or a plain text depending on invoiceType value passed
+     * @params {number} invoiceType - can be 1 or 2, default is 0
+     * @returns {object | string }
+     * */
     async uploadInvoice(invoiceType) {
         const today = new Date(Date.now());
         const invoice = {
@@ -61,6 +67,17 @@ class PaymentController {
             }
         });
     }
+    /**
+     * @description Closes an invoice to ensure your customers receive the Zapper Code that is relevant to their payment
+     * Invoices are automatically closed after 1Hr
+     * */
+    async closeInvoiceByRef(invoiceReference) {
+        return axios.delete(`/api/v1/merchants/${config.MERCHANT_ID}/sites/${config.SITE_ID}/invoices/${invoiceReference}`);
+    }
+
+    async closeInvoiceByExternalRef(externalRef) {
+        return axios.delete(`/api/v1/merchants/${config.MERCHANT_ID}/sites/${config.SITE_ID}/invoices?externalReference=${externalRef}`);
+    }
 }
 
-module.exports = PaymentController;
+module.exports = InvoiceController;
