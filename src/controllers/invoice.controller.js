@@ -43,6 +43,9 @@ class InvoiceController {
             }
         });
     }
+    /**
+     * @description Gets a plain-text string that can be converted to a Qr-code
+     * */
     async uploadPlainTextInvoice(invoice) {
         return axios.post(`/api/v1/merchants/${config.MERCHANT_ID}/sites/${config.SITE_ID}/invoices`, invoice, {
             headers: {
