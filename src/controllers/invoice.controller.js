@@ -30,26 +30,7 @@ class InvoiceController {
      * @returns {object | string }
      * */
     async uploadInvoice(invoiceType) {
-        const today = new Date(Date.now());
-        const invoice = {
-            externalReference: "MAR-INV-" + Math.floor(Math.random() * 1000),
-            siteReference: "martian.co.za",
-            currencyISOCode: "ZAR",
-            amount: 1000,
-            lineItems: [
-                {
-                    name: "",
-                    productCode: "",
-                    SKU: "",
-                    unitPrice: 500,
-                    categories: [],
-                    quantity: 2
-                }
-            ],
-            origin: "martian.co.za",
-            createdUTCDate: today.toISOString(),
-            originReference: ""
-        }
+
         /** control generated invoice types */
         let invType = "image/svg+xml";
 
@@ -64,6 +45,33 @@ class InvoiceController {
         return axios.post(`/api/v1/merchants/${config.MERCHANT_ID}/sites/${config.SITE_ID}/invoices`, invoice, {
             headers: {
                 "Accept": invType
+            }
+        });
+    }
+    /**
+     * @description Uploads invoice and returns Zapper qr-code as SVG
+     * */
+    async uploadQRCodeInvoice(invoice) {
+        return axios.post(`/api/v1/merchants/${config.MERCHANT_ID}/sites/${config.SITE_ID}/invoices`, invoice, {
+            headers: {
+                "Accept": "image/svg+xml"
+            }
+        });
+    }
+    /**
+     * @description Uploads invoice and returns a JSON response with "reference"
+     * */
+    async uploadJSONInvoice(invoice) {
+        return axios.post(`/api/v1/merchants/${config.MERCHANT_ID}/sites/${config.SITE_ID}/invoices`, invoice, {
+            headers: {
+                "Accept": "application/json"
+            }
+        });
+    }
+    async uploadPlainTextInvoice(invoice) {
+        return axios.post(`/api/v1/merchants/${config.MERCHANT_ID}/sites/${config.SITE_ID}/invoices`, invoice, {
+            headers: {
+                "Accept": "text/plain"
             }
         });
     }
