@@ -24,31 +24,6 @@ axios.defaults.headers["Content-Type"] = "application/json";
 class InvoiceController {
 
     /**
-     * @description Create a Zapper invoice and
-     * will return either a qr-code image, object with reference or a plain text depending on invoiceType value passed
-     * @params {number} invoiceType - can be 1 or 2, default is 0
-     * @returns {object | string }
-     * */
-    async uploadInvoice(invoiceType) {
-
-        /** control generated invoice types */
-        let invType = "image/svg+xml";
-
-        if (invoiceType === 1) {
-            invType = "application/json"
-        }
-        if (invoiceType === 2) {
-            invType = "text/plain";
-        }
-        /** control generated invoice types */
-
-        return axios.post(`/api/v1/merchants/${config.MERCHANT_ID}/sites/${config.SITE_ID}/invoices`, invoice, {
-            headers: {
-                "Accept": invType
-            }
-        });
-    }
-    /**
      * @description Uploads invoice and returns Zapper qr-code as SVG
      * */
     async uploadQRCodeInvoice(invoice) {
