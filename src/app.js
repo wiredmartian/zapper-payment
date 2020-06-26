@@ -63,6 +63,15 @@ app.post("/api/invoice/json", async (req, res) => {
         return res.send(400, { error: e.message });
     }
 });
+app.post("/api/payment/notify", async (req, res) => {
+    try {
+        const zapperPayResponse = req.body;
+        await new InvoiceController().notificationWebHook(zapperPayResponse);
+        return res.send("Ok");
+    } catch (e) {
+        return res.send(400, { error: e.message });
+    }
+})
 
 app.listen("3001", function () {
     console.log("app is listening at port 3001");
