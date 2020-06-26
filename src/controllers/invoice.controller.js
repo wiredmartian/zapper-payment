@@ -24,46 +24,32 @@ axios.defaults.headers["Content-Type"] = "application/json";
 class InvoiceController {
 
     /**
-     * @description Create a Zapper invoice and
-     * will return either a qr-code image, object with reference or a plain text depending on invoiceType value passed
-     * @params {number} invoiceType - can be 1 or 2, default is 0
-     * @returns {object | string }
+     * @description Uploads invoice and returns Zapper qr-code as SVG
      * */
-    async uploadInvoice(invoiceType) {
-        const today = new Date(Date.now());
-        const invoice = {
-            externalReference: "MAR-INV-" + Math.floor(Math.random() * 1000),
-            siteReference: "martian.co.za",
-            currencyISOCode: "ZAR",
-            amount: 1000,
-            lineItems: [
-                {
-                    name: "",
-                    productCode: "",
-                    SKU: "",
-                    unitPrice: 500,
-                    categories: [],
-                    quantity: 2
-                }
-            ],
-            origin: "martian.co.za",
-            createdUTCDate: today.toISOString(),
-            originReference: ""
-        }
-        /** control generated invoice types */
-        let invType = "image/svg+xml";
-
-        if (invoiceType === 1) {
-            invType = "application/json"
-        }
-        if (invoiceType === 2) {
-            invType = "text/plain";
-        }
-        /** control generated invoice types */
-
+    async uploadQRCodeInvoice(invoice) {
         return axios.post(`/api/v1/merchants/${config.MERCHANT_ID}/sites/${config.SITE_ID}/invoices`, invoice, {
             headers: {
-                "Accept": invType
+                "Accept": "image/svg+xml"
+            }
+        });
+    }
+    /**
+     * @description Uploads invoice and returns a JSON response with "reference"
+     * */
+    async uploadJSONInvoice(invoice) {
+        return axios.post(`/api/v1/merchants/${config.MERCHANT_ID}/sites/${config.SITE_ID}/invoices`, invoice, {
+            headers: {
+                "Accept": "application/json"
+            }
+        });
+    }
+    /**
+     * @description Gets a plain-text string that can be converted to a Qr-code
+     * */
+    async uploadPlainTextInvoice(invoice) {
+        return axios.post(`/api/v1/merchants/${config.MERCHANT_ID}/sites/${config.SITE_ID}/invoices`, invoice, {
+            headers: {
+                "Accept": "text/plain"
             }
         });
     }
@@ -82,6 +68,35 @@ class InvoiceController {
      * */
     async closeInvoiceByExternalRef(externalRef) {
         return axios.delete(`/api/v1/merchants/${config.MERCHANT_ID}/sites/${config.SITE_ID}/invoices?externalReference=${externalRef}`);
+    }
+    /**
+     * @description Zapper Http web-hook for payment notifications
+     * You can also write this info to your own database
+     * */
+    async notificationWebHook(zapperResponse) {
+        const response = {
+            Reference: zapperResponse.Reference,
+            PaymentStatusId: zapperResponse.PaymentStatusId,
+            PosReference: zapperResponse.PosReference,
+            PSPData: zapperResponse.PSPData,
+            Amount: zapperResponse.Amount,
+            ZapperId: zapperResponse.ZapperId,
+            UpdatedDate: zapperResponse.UpdatedDate,
+            TipAmount: zapperResponse.TipAmount,
+            VoucherAmount: zapperResponse.VoucherAmount,
+            ZapperDiscountAmount: zapperResponse.ZapperDiscountAmount,
+            InvoiceAmount: zapperResponse.InvoiceAmount,
+            Vouchers:[],
+            CustomFields:[]
+        }
+        if (response.PaymentStatusId === 5) {
+            /** payment failed */
+        }
+
+        if (response.PaymentStatusId === 2) {
+            /** payment was successful */
+            await this.closeInvoiceByRef(response.Reference)
+        }
     }
 }
 
