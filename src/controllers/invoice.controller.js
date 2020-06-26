@@ -66,6 +66,35 @@ class InvoiceController {
     async closeInvoiceByExternalRef(externalRef) {
         return axios.delete(`/api/v1/merchants/${config.MERCHANT_ID}/sites/${config.SITE_ID}/invoices?externalReference=${externalRef}`);
     }
+    /**
+     * @description Zapper Http web-hook for payment notifications
+     * You can also write this info to your own database
+     * */
+    async notificationWebHook(zapperResponse) {
+        const response = {
+            Reference: zapperResponse.Reference,
+            PaymentStatusId: zapperResponse.PaymentStatusId,
+            PosReference: zapperResponse.PosReference,
+            PSPData: zapperResponse.PSPData,
+            Amount: zapperResponse.Amount,
+            ZapperId: zapperResponse.ZapperId,
+            UpdatedDate: zapperResponse.UpdatedDate,
+            TipAmount: zapperResponse.TipAmount,
+            VoucherAmount: zapperResponse.VoucherAmount,
+            ZapperDiscountAmount: zapperResponse.ZapperDiscountAmount,
+            InvoiceAmount: zapperResponse.InvoiceAmount,
+            Vouchers:[],
+            CustomFields:[]
+        }
+        if (response.PaymentStatusId === 5) {
+            /** payment failed */
+        }
+
+        if (response.PaymentStatusId === 2) {
+            /** payment was successful */
+            await this.closeInvoiceByRef(response.Reference)
+        }
+    }
 }
 
 module.exports = InvoiceController;
