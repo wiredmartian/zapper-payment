@@ -1,6 +1,7 @@
 const express = require("express");
 const bodyParser = require("body-parser");
 const InvoiceController = require("./controllers/invoice.controller");
+const PaymentController = require("./controllers/payment.controller");
 
 const app = express();
 
@@ -8,7 +9,7 @@ app.use(bodyParser.json());
 
 const today = new Date(Date.now());
 const invoice = {
-    externalReference: "MAR-INV-" + Math.floor(Math.random() * 1000),
+    externalReference: "",
     siteReference: "martians.com",
     currencyISOCode: "ZAR",
     amount: 0,
@@ -16,6 +17,7 @@ const invoice = {
     createdUTCDate: "",
     originReference: ""
 }
+console.log(invoice.externalReference);
 
 app.post("/api/invoice/qr-code", async (req, res) => {
     try {
@@ -24,6 +26,7 @@ app.post("/api/invoice/qr-code", async (req, res) => {
          * */
         invoice.createdUTCDate = today.toISOString();
         invoice.lineItems = req.body.lineItems;
+        invoice.externalReference = "MAR-INV-" + Math.floor(Math.random() * 1000);
         Array.from(invoice.lineItems).forEach((item) => {
             invoice.amount += item.unitPrice * item.quantity
         });
@@ -39,6 +42,7 @@ app.post("/api/invoice/plain-text", async (req, res) => {
     try {
         invoice.createdUTCDate = today.toISOString();
         invoice.lineItems = req.body.lineItems;
+        invoice.externalReference = "MAR-INV-" + Math.floor(Math.random() * 1000);
         Array.from(invoice.lineItems).forEach((item) => {
             invoice.amount += item.unitPrice * item.quantity
         });
@@ -52,6 +56,7 @@ app.post("/api/invoice/json", async (req, res) => {
     try {
         invoice.createdUTCDate = today.toISOString();
         invoice.lineItems = req.body.lineItems;
+        invoice.externalReference = "MAR-INV-" + Math.floor(Math.random() * 1000);
         Array.from(invoice.lineItems).forEach((item) => {
             invoice.amount += item.unitPrice * item.quantity
         });
@@ -67,6 +72,16 @@ app.post("/api/payment/notify", async (req, res) => {
         await new InvoiceController().notificationWebHook(zapperPayResponse);
         return res.send("Ok");
     } catch (e) {
+        return res.status(400).send( { error: e.message });
+    }
+});
+
+app.get("/api/merchant/payments", async (req, res) => {
+    try {
+        const payments = await new PaymentController().getPaymentsByMerchant();
+        return res.send(payments.data);
+    } catch (e) {
+        console.error(e);
         return res.status(400).send( { error: e.message });
     }
 })
