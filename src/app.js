@@ -1,66 +1,69 @@
 const express = require("express");
+const bodyParser = require("body-parser");
 const InvoiceController = require("./controllers/invoice.controller");
+const PaymentController = require("./controllers/payment.controller");
 
 const app = express();
 
+app.use(bodyParser.json());
+
 const today = new Date(Date.now());
 const invoice = {
-    externalReference: "MAR-INV-" + Math.floor(Math.random() * 1000),
+    externalReference: "",
     siteReference: "martians.com",
     currencyISOCode: "ZAR",
     amount: 0,
-    lineItems: [
-        {
-            name: "",
-            productCode: "",
-            SKU: "",
-            unitPrice: 500,
-            categories: [],
-            quantity: 2
-        }
-    ],
     origin: "martians.com",
     createdUTCDate: "",
     originReference: ""
 }
+console.log(invoice.externalReference);
 
 app.post("/api/invoice/qr-code", async (req, res) => {
     try {
+        /**
+         * lineItems: [{ name: "", productCode: "", SKU: "", unitPrice: 500, categories: [], quantity: 2 }]
+         * */
         invoice.createdUTCDate = today.toISOString();
         invoice.lineItems = req.body.lineItems;
+        invoice.externalReference = "MAR-INV-" + Math.floor(Math.random() * 1000);
         Array.from(invoice.lineItems).forEach((item) => {
             invoice.amount += item.unitPrice * item.quantity
         });
+        invoice.amount = invoice.amount * 100; // convert to cents
         const result = await new InvoiceController().uploadQRCodeInvoice(invoice);
         return res.send(result.data);
     } catch (e) {
-        return res.send(400, { error: e.message });
+        console.log(e);
+        return res.status(400).send( { error: e.message });
     }
 });
 app.post("/api/invoice/plain-text", async (req, res) => {
     try {
         invoice.createdUTCDate = today.toISOString();
         invoice.lineItems = req.body.lineItems;
+        invoice.externalReference = "MAR-INV-" + Math.floor(Math.random() * 1000);
         Array.from(invoice.lineItems).forEach((item) => {
             invoice.amount += item.unitPrice * item.quantity
         });
         const result = await new InvoiceController().uploadPlainTextInvoice(invoice);
         return res.send(result.data);
     } catch (e) {
-        return res.send(400, { error: e.message });
+        return res.status(400).send( { error: e.message });
     }
 });
 app.post("/api/invoice/json", async (req, res) => {
     try {
         invoice.createdUTCDate = today.toISOString();
         invoice.lineItems = req.body.lineItems;
+        invoice.externalReference = "MAR-INV-" + Math.floor(Math.random() * 1000);
         Array.from(invoice.lineItems).forEach((item) => {
             invoice.amount += item.unitPrice * item.quantity
         });
         const result = await new InvoiceController().uploadJSONInvoice(invoice);
         return res.send(result.data);
     } catch (e) {
-        return res.send(400, { error: e.message });
+        return res.status(400).send( { error: e.message });
     }
 });
 app.post("/api/payment/notify", async (req, res) => {
@@ -69,7 +72,17 @@ app.post("/api/payment/notify", async (req, res) => {
         await new InvoiceController().notificationWebHook(zapperPayResponse);
         return res.send("Ok");
     } catch (e) {
-        return res.send(400, { error: e.message });
+        return res.status(400).send( { error: e.message });
+    }
+});
+
+app.post("/api/merchant/payments", async (req, res) => {
+    try {
+        const payments = await new PaymentController().getPaymentsByMerchant(req.body.invoiceRef);
+        return res.send(payments.data);
+    } catch (e) {
+        console.error(e);
+        return res.status(400).send( { error: e.message });
     }
 })
 
