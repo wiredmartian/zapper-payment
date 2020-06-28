@@ -76,9 +76,9 @@ app.post("/api/payment/notify", async (req, res) => {
     }
 });
 
-app.get("/api/merchant/payments", async (req, res) => {
+app.post("/api/merchant/payments", async (req, res) => {
     try {
-        const payments = await new PaymentController().getPaymentsByMerchant();
+        const payments = await new PaymentController().getPaymentsByMerchant(req.body.invoiceRef);
         return res.send(payments.data);
     } catch (e) {
         console.error(e);

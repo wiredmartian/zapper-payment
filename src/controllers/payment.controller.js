@@ -15,15 +15,15 @@ const config = envSchema({
 });
 class PaymentController {
     async getPaymentsByMerchant(externalRef) {
-        return axios.get(`/api/v1/merchants/${config.MERCHANT_ID}/payments?externalReference=MAR-INV-333`, {
+        return axios.get(`/api/v1/merchants/${config.MERCHANT_ID}/payments?externalReference=${externalRef}`, {
             headers: {
                 Accept: "application/json",
                 "x-api-key": config.MERCHANT_API_KEY
             }
         });
     }
-    async getPaymentBySite() {
-        return axios.get(`/api/v1/merchants/${config.MERCHANT_ID}/sites/${config.SITE_ID}/payments?externalReference=MAR-INV-333`, {
+    async getPaymentBySite(externalRef) {
+        return axios.get(`/api/v1/merchants/${config.MERCHANT_ID}/sites/${config.SITE_ID}/payments?externalReference=${externalRef}`, {
             headers: {
                 Accept: "application/json",
                 "x-api-key": config.MERCHANT_API_KEY
