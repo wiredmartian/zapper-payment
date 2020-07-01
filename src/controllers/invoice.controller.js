@@ -87,7 +87,7 @@ class InvoiceController {
 
         if (response.PaymentStatusId === 2) {
             /** payment was successful */
-            await this.closeInvoiceByRef(response.Reference)
+            await this.closeInvoiceByRef(response.Reference);
         }
     }
 }
