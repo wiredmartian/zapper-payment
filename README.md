@@ -19,3 +19,7 @@ MERCHANT_API_KEY=xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 MERCHANT_SITE_API_KEY=xxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 ZAPPER_API_URL=https://api.zapper.com/business
 ```
+
+## Tutorial Video
+
+https://www.youtube.com/watch?v=4miGG0pwdUo
